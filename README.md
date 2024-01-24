@@ -1,25 +1,26 @@
-# NeuN_CFos
+# Sox9_PV_CFos
 
 * **Developed for:** Rachel
 * **Team:** Prochiantz
-* **Date:** September 2023
+* **Date:** January 2024
 * **Software:** Fiji
 
 ### Images description
 
-3D images taken with a x20 objective
+3D images taken with a x25 objective on the Zeiss W1 spinning-disk microscope
 
-2 channels:
-  1. *CSU_488:* NeuN cells
-  2. *CSU_642:* CFos cells
+4 channels:
+  1. *CSU_405:* DAPI
+  2. *CSU_488:* Sox9
+  3. *CSU_561:* CFos
+  4. *CSU_642:* PV
 
 ### Plugin description
 
-* Detect NeuN and CFos cells with Stardist
-* Colocalize NeuN and CFos cells
+* Detect Sox9 and PV cells with Stardist
 * For each channel, compute background noise as median intensity value of Z projection over min intensity
-* For each cell, compute its volume and intensity/background-corrected intensity in each channel in which it appears
-
+* For each cell, compute its volume and background-corrected intensity in its respective channel and in the CFos channel
+  
 ### Dependencies
 
 * **3DImageSuite** Fiji plugin
@@ -27,4 +28,4 @@
 
 ### Version history
 
-Version 1 released on September 13, 2023.
+Version 1 released on January 24, 2024.
