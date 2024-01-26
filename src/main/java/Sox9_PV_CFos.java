@@ -90,13 +90,15 @@ public class Sox9_PV_CFos implements PlugIn {
             // Write headers results for results files
             FileWriter fwResultsSox9 = new FileWriter(outDirResults + "resultsSox9.csv", false);
             BufferedWriter resultsSox9 = new BufferedWriter(fwResultsSox9);
-            resultsSox9.write("Image name\tImage vol (µm3)\tSox9 bg\tCFos bg\tSox9 cell label\tCell vol (µm3)\t"
-                         + "Sox9 bg-corrected mean int\tCFos bg-corrected mean int\n");
+            resultsSox9.write("Image name\tImage vol (µm3)\tSox9 bg\tCFos bg\tSox9 cell label\tCell vol (µm3)"
+                         + "\tSox9 bg-corrected mean int\tSox9 bg-corrected integrated int"
+                         + "\tCFos bg-corrected mean int\tCFos bg-corrected integrated int\n");
             resultsSox9.flush();
             FileWriter fwResultsPv = new FileWriter(outDirResults + "resultsPV.csv", false);
             BufferedWriter resultsPv = new BufferedWriter(fwResultsPv);
-            resultsPv.write("Image name\tImage vol (µm3)\tPV bg\tCFos bg\tPV cell label\tCell vol (µm3)\t"
-                         + "PV bg-corrected mean int\tCFos bg-corrected mean int\n");
+            resultsPv.write("Image name\tImage vol (µm3)\tPV bg\tCFos bg\tPV cell label\tCell vol (µm3)"
+                         + "\tPV bg-corrected mean int\tPV bg-corrected integrated int"
+                         + "\tCFos bg-corrected mean int\tCFos bg-corrected integrated int\n");
             resultsPv.flush();
             
             for (String f: imageFiles) {
@@ -134,17 +136,24 @@ public class Sox9_PV_CFos implements PlugIn {
                 tools.print("- Writing and drawing results -");
                 double imgVol = imgSox9.getWidth() * imgSox9.getHeight() * imgSox9.getNSlices() * tools.pixVol;
                 for(Object3DInt cell: popSox9.getObjects3DInt()) {
-                    double vol = new MeasureVolume(cell).getVolumeUnit();
-                    double corrInt = new MeasureIntensity(cell, ImageHandler.wrap(imgSox9)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgSox9;
-                    double cfosCorrInt = new MeasureIntensity(cell, ImageHandler.wrap(imgCfos)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgCfos;
-                    resultsSox9.write(rootName+"\t"+imgVol+"\t"+bgSox9+"\t"+bgCfos+"\t"+cell.getLabel()+"\t"+vol+"\t"+corrInt+"\t"+cfosCorrInt+"\n");                                
+                    double volUnit = new MeasureVolume(cell).getVolumeUnit();
+                    double volPix = new MeasureVolume(cell).getVolumePix();
+                    double corrMeanInt = new MeasureIntensity(cell, ImageHandler.wrap(imgSox9)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgSox9;
+                    double corrIntInt = new MeasureIntensity(cell, ImageHandler.wrap(imgSox9)).getValueMeasurement(MeasureIntensity.INTENSITY_SUM) - bgSox9*volPix;
+                    double cfosCorrMeanInt = new MeasureIntensity(cell, ImageHandler.wrap(imgCfos)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgCfos;
+                    double cfosCorrIntInt = new MeasureIntensity(cell, ImageHandler.wrap(imgCfos)).getValueMeasurement(MeasureIntensity.INTENSITY_SUM) - bgCfos*volPix;
+                    resultsSox9.write(rootName+"\t"+imgVol+"\t"+bgSox9+"\t"+bgCfos+"\t"+cell.getLabel()+"\t"+volUnit+"\t"+corrMeanInt+"\t"+corrIntInt+"\t"+cfosCorrMeanInt+"\t"+cfosCorrIntInt+"\n");                                
                     resultsSox9.flush();
                 }
                 for(Object3DInt cell: popPv.getObjects3DInt()) {
-                    double vol = new MeasureVolume(cell).getVolumeUnit();
-                    double corrInt = new MeasureIntensity(cell, ImageHandler.wrap(imgPv)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgPv;
-                    double cfosCorrInt = new MeasureIntensity(cell, ImageHandler.wrap(imgCfos)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgCfos;
-                    resultsPv.write(rootName+"\t"+imgVol+"\t"+bgPv+"\t"+bgCfos+"\t"+cell.getLabel()+"\t"+vol+"\t"+corrInt+"\t"+cfosCorrInt+"\n");                                
+                    double volUnit = new MeasureVolume(cell).getVolumeUnit();
+                    double volPix = new MeasureVolume(cell).getVolumePix();
+                    double corrMeanInt = new MeasureIntensity(cell, ImageHandler.wrap(imgPv)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgPv;
+                    double corrIntInt = new MeasureIntensity(cell, ImageHandler.wrap(imgPv)).getValueMeasurement(MeasureIntensity.INTENSITY_SUM) - bgPv*volPix;
+                    double cfosCorrMeanInt = new MeasureIntensity(cell, ImageHandler.wrap(imgCfos)).getValueMeasurement(MeasureIntensity.INTENSITY_AVG) - bgCfos;
+                    double cfosCorrIntInt = new MeasureIntensity(cell, ImageHandler.wrap(imgCfos)).getValueMeasurement(MeasureIntensity.INTENSITY_SUM) - bgCfos*volPix;
+                    
+                    resultsPv.write(rootName+"\t"+imgVol+"\t"+bgPv+"\t"+bgCfos+"\t"+cell.getLabel()+"\t"+volUnit+"\t"+corrMeanInt+"\t"+corrIntInt+"\t"+cfosCorrMeanInt+"\t"+cfosCorrIntInt+"\n");                                
                     resultsPv.flush();
                 }
                 
